@@ -9,6 +9,9 @@
 //Adafruit_MCP23X08 mcp;
 Adafruit_MCP23X17 mcp;
 
+unsigned int timer = 0;
+unsigned int i = 1;
+
 int DG1 = 0;
 int DG2 = 1;
 int COL = 2;
@@ -60,6 +63,44 @@ void two(int digit) {
   mcp.digitalWrite(SGg, LOW);
 }
 
+void dispNumber(int number) {
+  switch(number) {
+    case 1:
+      mcp.digitalWrite(SGa, HIGH);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, HIGH);
+      mcp.digitalWrite(SGe, HIGH);
+      mcp.digitalWrite(SGf, HIGH);
+      mcp.digitalWrite(SGg, HIGH);
+      break;
+
+    case 2:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, HIGH);
+      mcp.digitalWrite(SGd, LOW);
+      mcp.digitalWrite(SGe, LOW);
+      mcp.digitalWrite(SGf, HIGH);
+      mcp.digitalWrite(SGg, LOW);
+      break;
+  }
+}
+
+void showDigits(int number) {
+  dispNumber(number);
+  mcp.digitalWrite(DG1, HIGH);
+  mcp.digitalWrite(DG2, LOW);
+  mcp.digitalWrite(DG3, LOW);
+  mcp.digitalWrite(DG4, LOW);
+
+  delay(1);
+
+  dispNumber(number);
+  mcp.digitalWrite(DG1, LOW);
+  mcp.digitalWrite(DG2, HIGH);
+}
+
 void setup() {
   Serial.begin(9600);
   //while (!Serial);
@@ -97,10 +138,14 @@ void setup() {
 }
 
 void loop() {
-  blank();
-  one(0);
-  delay(500);
-  blank();
-  two(0);
-  delay(500);
+  timer++;
+
+  showDigits(i);
+
+  if(timer > 10) {
+    timer = 0;
+    i++;
+
+    if(i>2) {i=1;}
+  }
 }

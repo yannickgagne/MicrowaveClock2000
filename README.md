@@ -1,5 +1,5 @@
 # MicrowaveClock2000
-Desk clock with DHT22 &amp; Azure IoT
+Desk clock based on ESP8266 with DHT22 &amp; Azure IoT
 
 ## Description
 Why not make my life more complicated with this fine project.

@@ -9,6 +9,57 @@
 //Adafruit_MCP23X08 mcp;
 Adafruit_MCP23X17 mcp;
 
+int DG1 = 0;
+int DG2 = 1;
+int COL = 2;
+int DG3 = 3;
+int DG4 = 4;
+int SGa = 8;
+int SGb = 9;
+int SGc = 10;
+int SGd = 12;
+int SGe = 13;
+int SGf = 14;
+int SGg = 15;
+
+void blank() {
+  mcp.digitalWrite(DG1, LOW);
+  mcp.digitalWrite(DG2, LOW);
+  mcp.digitalWrite(COL, LOW);
+  mcp.digitalWrite(DG3, LOW);
+  mcp.digitalWrite(DG4, LOW);
+  mcp.digitalWrite(SGa, HIGH);
+  mcp.digitalWrite(SGb, HIGH);
+  mcp.digitalWrite(SGc, HIGH);
+  mcp.digitalWrite(11, HIGH);
+  mcp.digitalWrite(SGd, HIGH);
+  mcp.digitalWrite(SGe, HIGH);
+  mcp.digitalWrite(SGf, HIGH);
+  mcp.digitalWrite(SGg, HIGH);
+}
+
+void one(int digit) {
+  mcp.digitalWrite(digit, HIGH);
+  mcp.digitalWrite(SGa, HIGH);
+  mcp.digitalWrite(SGb, LOW);
+  mcp.digitalWrite(SGc, LOW);
+  mcp.digitalWrite(SGd, HIGH);
+  mcp.digitalWrite(SGe, HIGH);
+  mcp.digitalWrite(SGf, HIGH);
+  mcp.digitalWrite(SGg, HIGH);
+}
+
+void two(int digit) {
+  mcp.digitalWrite(digit, HIGH);
+  mcp.digitalWrite(SGa, LOW);
+  mcp.digitalWrite(SGb, LOW);
+  mcp.digitalWrite(SGc, HIGH);
+  mcp.digitalWrite(SGd, LOW);
+  mcp.digitalWrite(SGe, LOW);
+  mcp.digitalWrite(SGf, HIGH);
+  mcp.digitalWrite(SGg, LOW);
+}
+
 void setup() {
   Serial.begin(9600);
   //while (!Serial);
@@ -22,48 +73,34 @@ void setup() {
   }
 
   // configure pin for output
-  mcp.pinMode(0, OUTPUT);
-  mcp.pinMode(1, OUTPUT);
-  mcp.pinMode(2, OUTPUT);
-  mcp.pinMode(3, OUTPUT);
-  mcp.pinMode(4, OUTPUT);
-  mcp.pinMode(5, OUTPUT);
-  mcp.pinMode(6, OUTPUT);
-  mcp.pinMode(7, OUTPUT);
-  mcp.pinMode(8, OUTPUT);
-  mcp.pinMode(9, OUTPUT);
-  mcp.pinMode(10, OUTPUT);
-  mcp.pinMode(11, OUTPUT);
-  mcp.pinMode(12, OUTPUT);
-  mcp.pinMode(13, OUTPUT);
-  mcp.pinMode(14, OUTPUT);
-  mcp.pinMode(15, OUTPUT);
+  mcp.pinMode(DG1, OUTPUT); //1st digit
+  mcp.pinMode(DG2, OUTPUT); //2nd digit
+  mcp.pinMode(COL, OUTPUT); //Colon
+  mcp.pinMode(DG3, OUTPUT); //3rd digit
+  mcp.pinMode(DG4, OUTPUT); //4th digit
+  mcp.pinMode(5, OUTPUT); //NOT USED
+  mcp.pinMode(6, OUTPUT); //NOT USED
+  mcp.pinMode(7, OUTPUT); //NOT USED
+  mcp.pinMode(SGa, OUTPUT); //Segment a
+  mcp.pinMode(SGb, OUTPUT); //Segment b
+  mcp.pinMode(SGc, OUTPUT); //Segment c
+  mcp.pinMode(11, OUTPUT); //NOT USED (Microwave functions items)
+  mcp.pinMode(SGd, OUTPUT); //Segment d
+  mcp.pinMode(SGe, OUTPUT); //Segment e
+  mcp.pinMode(SGf, OUTPUT); //Segment f
+  mcp.pinMode(SGg, OUTPUT); //Segment g
 
-  mcp.digitalWrite(0, LOW);
-  mcp.digitalWrite(1, LOW);
-  mcp.digitalWrite(2, LOW);
-  mcp.digitalWrite(3, LOW);
-  mcp.digitalWrite(4, LOW);
-  mcp.digitalWrite(5, LOW);
-  mcp.digitalWrite(6, LOW);
-  mcp.digitalWrite(7, LOW);
-  mcp.digitalWrite(8, HIGH);
-  mcp.digitalWrite(9, HIGH);
-  mcp.digitalWrite(10, HIGH);
-  mcp.digitalWrite(11, HIGH);
-  mcp.digitalWrite(12, HIGH);
-  mcp.digitalWrite(13, HIGH);
-  mcp.digitalWrite(14, HIGH);
-  mcp.digitalWrite(15, HIGH);
+  //Turn OFF all
+  blank();
   
-  Serial.println("Looping...");
+  Serial.println("Starting Loop...");
 }
 
 void loop() {
-  mcp.digitalWrite(0, HIGH);
-  mcp.digitalWrite(8, LOW);
+  blank();
+  one(0);
   delay(500);
-  mcp.digitalWrite(0, LOW);
-  mcp.digitalWrite(8, HIGH);
+  blank();
+  two(0);
   delay(500);
 }

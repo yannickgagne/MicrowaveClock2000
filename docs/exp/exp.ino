@@ -169,22 +169,28 @@ void setDigit(int digit) {
 
 void showNumber(int number) {
   //Serial.println(number);
+  //get number len
+  int len = intLen(number);
   //break integer in buffer
   char buf[2];
   itoa(number, buf, 10);
   char rbuf[2];
-  rbuf[1] = buf[0];
-  rbuf[0] = buf[1];
+  if(len > 1) {
+    rbuf[1] = buf[0];
+    rbuf[0] = buf[1];
+  } else {
+    rbuf[0] = buf[0];
+    rbuf[1] = buf[1];
+  }
   
   for (int i = 0; i < 2; i++) {
     if((rbuf[i] - '0') < 0) {
       rbuf[i] = '0';
     }
   }
-  //get number len
-  int len = intLen(number);
+
   //loop on len
-  for(int x = 1; x-- > 0;) {
+  for(int x = 2; x-- > 0;) {
     setSegments((rbuf[x] - '0'));
     setDigit(x);
     delay(1);

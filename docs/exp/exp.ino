@@ -10,7 +10,8 @@
 Adafruit_MCP23X17 mcp;
 
 unsigned int timer = 0;
-unsigned int i = 1;
+unsigned long lastTick = 0;
+unsigned int i = 0;
 
 int DG1 = 0;
 int DG2 = 1;
@@ -41,30 +42,18 @@ void blank() {
   mcp.digitalWrite(SGg, HIGH);
 }
 
-void one(int digit) {
-  mcp.digitalWrite(digit, HIGH);
-  mcp.digitalWrite(SGa, HIGH);
-  mcp.digitalWrite(SGb, LOW);
-  mcp.digitalWrite(SGc, LOW);
-  mcp.digitalWrite(SGd, HIGH);
-  mcp.digitalWrite(SGe, HIGH);
-  mcp.digitalWrite(SGf, HIGH);
-  mcp.digitalWrite(SGg, HIGH);
-}
-
-void two(int digit) {
-  mcp.digitalWrite(digit, HIGH);
-  mcp.digitalWrite(SGa, LOW);
-  mcp.digitalWrite(SGb, LOW);
-  mcp.digitalWrite(SGc, HIGH);
-  mcp.digitalWrite(SGd, LOW);
-  mcp.digitalWrite(SGe, LOW);
-  mcp.digitalWrite(SGf, HIGH);
-  mcp.digitalWrite(SGg, LOW);
-}
-
-void dispNumber(int number) {
+void setSegments(int number) {
+  Serial.println(number);
   switch(number) {
+    case 0:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, LOW);
+      mcp.digitalWrite(SGe, LOW);
+      mcp.digitalWrite(SGf, LOW);
+      mcp.digitalWrite(SGg, HIGH);
+      break;
     case 1:
       mcp.digitalWrite(SGa, HIGH);
       mcp.digitalWrite(SGb, LOW);
@@ -74,7 +63,6 @@ void dispNumber(int number) {
       mcp.digitalWrite(SGf, HIGH);
       mcp.digitalWrite(SGg, HIGH);
       break;
-
     case 2:
       mcp.digitalWrite(SGa, LOW);
       mcp.digitalWrite(SGb, LOW);
@@ -84,21 +72,138 @@ void dispNumber(int number) {
       mcp.digitalWrite(SGf, HIGH);
       mcp.digitalWrite(SGg, LOW);
       break;
+    case 3:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, LOW);
+      mcp.digitalWrite(SGe, HIGH);
+      mcp.digitalWrite(SGf, HIGH);
+      mcp.digitalWrite(SGg, LOW);
+      break;
+    case 4:
+      mcp.digitalWrite(SGa, HIGH);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, HIGH);
+      mcp.digitalWrite(SGe, HIGH);
+      mcp.digitalWrite(SGf, LOW);
+      mcp.digitalWrite(SGg, LOW);
+      break;
+    case 5:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, HIGH);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, LOW);
+      mcp.digitalWrite(SGe, HIGH);
+      mcp.digitalWrite(SGf, LOW);
+      mcp.digitalWrite(SGg, LOW);
+      break;
+    case 6:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, HIGH);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, LOW);
+      mcp.digitalWrite(SGe, LOW);
+      mcp.digitalWrite(SGf, LOW);
+      mcp.digitalWrite(SGg, LOW);
+      break;
+    case 7:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, HIGH);
+      mcp.digitalWrite(SGe, HIGH);
+      mcp.digitalWrite(SGf, HIGH);
+      mcp.digitalWrite(SGg, HIGH);
+      break;
+    case 8:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, LOW);
+      mcp.digitalWrite(SGe, LOW);
+      mcp.digitalWrite(SGf, LOW);
+      mcp.digitalWrite(SGg, LOW);
+      break;
+    case 9:
+      mcp.digitalWrite(SGa, LOW);
+      mcp.digitalWrite(SGb, LOW);
+      mcp.digitalWrite(SGc, LOW);
+      mcp.digitalWrite(SGd, LOW);
+      mcp.digitalWrite(SGe, HIGH);
+      mcp.digitalWrite(SGf, LOW);
+      mcp.digitalWrite(SGg, LOW);
+      break;
   }
 }
 
-void showDigits(int number) {
-  dispNumber(number);
-  mcp.digitalWrite(DG1, HIGH);
-  mcp.digitalWrite(DG2, LOW);
-  mcp.digitalWrite(DG3, LOW);
-  mcp.digitalWrite(DG4, LOW);
+void setDigit(int digit) {
+  switch (digit) {
+    case 0:
+      mcp.digitalWrite(DG1, HIGH);
+      mcp.digitalWrite(DG2, LOW);
+      mcp.digitalWrite(DG3, LOW);
+      mcp.digitalWrite(DG4, LOW);
+      break;
+    case 1:
+      mcp.digitalWrite(DG1, LOW);
+      mcp.digitalWrite(DG2, HIGH);
+      mcp.digitalWrite(DG3, LOW);
+      mcp.digitalWrite(DG4, LOW);
+      break;
+    case 2:
+      mcp.digitalWrite(DG1, LOW);
+      mcp.digitalWrite(DG2, LOW);
+      mcp.digitalWrite(DG3, HIGH);
+      mcp.digitalWrite(DG4, LOW);
+      break;
+    case 3:
+      mcp.digitalWrite(DG1, LOW);
+      mcp.digitalWrite(DG2, LOW);
+      mcp.digitalWrite(DG3, LOW);
+      mcp.digitalWrite(DG4, HIGH);
+      break;
+  }
+}
 
+void showNumber(int number) {
+  //Serial.println(number);
+  //break integer in buffer
+  char buf[2];
+  itoa(number, buf, 10);
+  char rbuf[2];
+  rbuf[1] = buf[0];
+  rbuf[0] = buf[1];
+  
+  for (int i = 0; i < 2; i++) {
+    if((rbuf[i] - '0') < 0) {
+      rbuf[i] = '0';
+    }
+  }
+  //get number len
+  int len = intLen(number);
+  //loop on len
+  for(int x = 1; x-- > 0;) {
+    setSegments((rbuf[x] - '0'));
+    setDigit(x);
+    delay(1);
+  }
+  /*
+  //set segments
+  setSegments(number);
+  //set digits
+  setDigit(digit);
   delay(1);
+  */
+}
 
-  dispNumber(number);
-  mcp.digitalWrite(DG1, LOW);
-  mcp.digitalWrite(DG2, HIGH);
+int intLen(int x) {
+  if(x >= 1000) return 4;
+  if(x >= 100) return 3;
+  if(x >= 10) return 2;
+  if(x <= 9) return 1;
+  return 0; //means error!
 }
 
 void setup() {
@@ -138,14 +243,24 @@ void setup() {
 }
 
 void loop() {
+  delay(25);
+  showNumber(i);
+  
+  if(millis() - lastTick > 1000) {
+    lastTick = millis();
+    i++;
+    if(i>9) {i=0;}
+  }
+  /*
   timer++;
 
-  showDigits(i);
+  showNumber(i);
 
-  if(timer > 10) {
+  if(timer > 1000) {
     timer = 0;
     i++;
 
-    if(i>2) {i=1;}
+    if(i>20) {i=0;}
   }
+  */
 }

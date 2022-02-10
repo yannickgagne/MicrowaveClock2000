@@ -182,6 +182,11 @@ void showNumber(int number) {
     rbuf[0] = buf[0];
     rbuf[1] = buf[1];
   }
+
+  Serial.print("digit 0:");
+  Serial.print(rbuf[0]);
+  Serial.print(" / digit 1:");
+  Serial.println(rbuf[1]);
   
   for (int i = 0; i < 2; i++) {
     if((rbuf[i] - '0') < 0) {
@@ -249,7 +254,7 @@ void setup() {
 }
 
 void loop() {
-  delay(25);
+  //delay(5);
   showNumber(i);
   
   if(millis() - lastTick > 1000) {

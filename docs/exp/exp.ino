@@ -43,6 +43,7 @@ void blank() {
 }
 
 void setSegments(int number) {
+  Serial.print("Segment >>> ");
   Serial.println(number);
   switch(number) {
     case 0:

@@ -3,7 +3,7 @@
 // ok to include only the one needed
 // both included here to make things simple for example
 //#include <Adafruit_MCP23X08.h>
-#include <Adafruit_MCP23X17.h>
+#include "Adafruit_MCP23X17.h"
 
 // uncomment appropriate line
 //Adafruit_MCP23X08 mcp;
@@ -25,6 +25,14 @@ int SGd = 12;
 int SGe = 13;
 int SGf = 14;
 int SGg = 15;
+
+int intLen(int x) {
+  if(x >= 1000) return 4;
+  if(x >= 100) return 3;
+  if(x >= 10) return 2;
+  if(x <= 9) return 1;
+  return 0; //means error!
+}
 
 void blank() {
   mcp.digitalWrite(DG1, LOW);
@@ -207,14 +215,6 @@ void showNumber(int number) {
   setDigit(digit);
   delay(1);
   */
-}
-
-int intLen(int x) {
-  if(x >= 1000) return 4;
-  if(x >= 100) return 3;
-  if(x >= 10) return 2;
-  if(x <= 9) return 1;
-  return 0; //means error!
 }
 
 void setup() {

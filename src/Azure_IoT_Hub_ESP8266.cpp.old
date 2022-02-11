@@ -20,6 +20,8 @@
  * 
  * To properly connect to your Azure IoT Hub, please fill the information in the `iot_configs.h` file. 
  */
+// Additional sample headers 
+#include "iot_configs.h"
 //DHT22
 #include "Adafruit_Sensor.h"
 #include "DHT.h"
@@ -50,9 +52,6 @@ long humi = 0;
 #include <az_core.h>
 #include <az_iot.h>
 #include <azure_ca.h>
-
-// Additional sample headers 
-#include "iot_configs.h"
 
 // When developing for your own Arduino-based platform,
 // please follow the format '(ard;<platform>)'. 
@@ -89,6 +88,20 @@ static uint32_t telemetry_send_count = 0;
 
 
 // Auxiliary functions
+
+void getTempHumi()
+{
+  sensors_event_t event;
+  dht.temperature().getEvent(&event);
+
+  Serial.print(F("Temperature: "));
+  Serial.print(event.temperature);
+  Serial.println(F("°C"));
+
+  Serial.print(F("Humidity: "));
+  Serial.print(event.relative_humidity);
+  Serial.println(F("%"));
+}
 
 static void connectToWiFi()
 {
@@ -356,20 +369,6 @@ void setup()
   dht.begin();
   
   establishConnection();
-}
-
-void getTempHumi()
-{
-  sensors_event_t event;
-  dht.temperature().getEvent(&event);
-
-  Serial.print(F("Temperature: "));
-  Serial.print(event.temperature);
-  Serial.println(F("°C"));
-
-  Serial.print(F("Humidity: "));
-  Serial.print(event.relative_humidity);
-  Serial.println(F("%"));
 }
 
 void loop()

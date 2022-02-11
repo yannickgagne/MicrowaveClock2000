@@ -1,6 +1,6 @@
 .pio
 .vscode
-iot_configs.h
+include/iot_configs.h
 
 # Prerequisites
 *.d

@@ -43,7 +43,18 @@ void blank() {
   mcp.digitalWrite(SGa, HIGH);
   mcp.digitalWrite(SGb, HIGH);
   mcp.digitalWrite(SGc, HIGH);
-  mcp.digitalWrite(11, HIGH);
+  mcp.digitalWrite(11, HIGH); 
+  mcp.digitalWrite(SGd, HIGH);
+  mcp.digitalWrite(SGe, HIGH);
+  mcp.digitalWrite(SGf, HIGH);
+  mcp.digitalWrite(SGg, HIGH);
+}
+
+void segOff() {
+  mcp.digitalWrite(SGa, HIGH);
+  mcp.digitalWrite(SGb, HIGH);
+  mcp.digitalWrite(SGc, HIGH);
+  mcp.digitalWrite(11, HIGH); 
   mcp.digitalWrite(SGd, HIGH);
   mcp.digitalWrite(SGe, HIGH);
   mcp.digitalWrite(SGf, HIGH);
@@ -51,7 +62,7 @@ void blank() {
 }
 
 void setSegments(int number) {
-  Serial.println(number);
+  //Serial.println(number);
   switch(number) {
     case 0:
       mcp.digitalWrite(SGa, LOW);
@@ -143,10 +154,20 @@ void setSegments(int number) {
       mcp.digitalWrite(SGf, LOW);
       mcp.digitalWrite(SGg, LOW);
       break;
+    default: //if not 0..9, OFF all segments
+      mcp.digitalWrite(SGa, HIGH);
+      mcp.digitalWrite(SGb, HIGH);
+      mcp.digitalWrite(SGc, HIGH);
+      mcp.digitalWrite(SGd, HIGH);
+      mcp.digitalWrite(SGe, HIGH);
+      mcp.digitalWrite(SGf, HIGH);
+      mcp.digitalWrite(SGg, HIGH);
+      break;
   }
 }
 
 void setDigit(int digit) {
+  //delay(1);
   switch (digit) {
     case 0:
       mcp.digitalWrite(DG1, HIGH);
@@ -176,10 +197,9 @@ void setDigit(int digit) {
 }
 
 void showNumber(int number) {
-  //Serial.println(number);
   //get number len
   int len = intLen(number);
-  //break integer in buffer
+  //break integer in buffer and reverse order
   char buf[2];
   itoa(number, buf, 10);
   char rbuf[2];
@@ -191,30 +211,24 @@ void showNumber(int number) {
     rbuf[1] = buf[1];
   }
 
-  Serial.print("digit 0:");
-  Serial.print(rbuf[0]);
-  Serial.print(" / digit 1:");
-  Serial.println(rbuf[1]);
-  
   for (int i = 0; i < 2; i++) {
-    if((rbuf[i] - '0') < 0) {
-      rbuf[i] = '0';
+    //convert char buffer to integer
+    rbuf[i] = rbuf[i] - '0';
+    //if value smaller than zero, then equals zero
+    if((rbuf[i]) < 0) {
+      rbuf[i] = 0;
     }
   }
 
   //loop on len
-  for(int x = 2; x-- > 0;) {
-    setSegments((rbuf[x] - '0'));
+  for(int x = len; x-- > 0;) {
+    int v = rbuf[x];
+    //Serial.println(v);
+    segOff();
     setDigit(x);
-    delay(1);
+    setSegments(v);
+    //delay(1);
   }
-  /*
-  //set segments
-  setSegments(number);
-  //set digits
-  setDigit(digit);
-  delay(1);
-  */
 }
 
 void setup() {
@@ -255,12 +269,13 @@ void setup() {
 
 void loop() {
   //delay(5);
+  Serial.println(i);
   showNumber(i);
   
   if(millis() - lastTick > 1000) {
     lastTick = millis();
     i++;
-    if(i>9) {i=0;}
+    if(i>19) {i=0;}
   }
   /*
   timer++;

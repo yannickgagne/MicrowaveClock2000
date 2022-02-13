@@ -1,17 +1,11 @@
-// Blinks an LED attached to a MCP23XXX pin.
-
-// ok to include only the one needed
-// both included here to make things simple for example
-//#include <Adafruit_MCP23X08.h>
 #include "Adafruit_MCP23X17.h"
 
-// uncomment appropriate line
-//Adafruit_MCP23X08 mcp;
 Adafruit_MCP23X17 mcp;
 
 unsigned int timer = 0;
 unsigned long lastTick = 0;
-unsigned int i = 0;
+unsigned int i = 100;
+uint8_t prevSeg;
 
 int DG1 = 0;
 int DG2 = 1;
@@ -34,164 +28,79 @@ int intLen(int x) {
   return 0; //means error!
 }
 
+static const uint8_t segMap[] = {
+  // GFEDxCBA  Segments      7-segment map:
+  0b010001000, // 0   "0"          AAA
+  0b011111001, // 1   "1"         F   B
+  0b001001100, // 2   "2"         F   B
+  0b001101000, // 3   "3"          GGG
+  0b000111001, // 4   "4"         E   C
+  0b000101010, // 5   "5"         E   C
+  0b000001010, // 6   "6"          DDD
+  0b011111000, // 7   "7"
+  0b000001000, // 8   "8"
+  0b000101000, // 9   "9"
+};
+
+static const uint8_t segPins[] = {
+  8,
+  9,
+  10,
+  12,
+  13,
+  14,
+  15,
+};
+
 void blank() {
-  mcp.digitalWrite(DG1, LOW);
+  mcp.writeGPIOA(0b011111111);
+  /*mcp.digitalWrite(DG1, LOW);
   mcp.digitalWrite(DG2, LOW);
   mcp.digitalWrite(COL, LOW);
   mcp.digitalWrite(DG3, LOW);
-  mcp.digitalWrite(DG4, LOW);
-  mcp.digitalWrite(SGa, HIGH);
+  mcp.digitalWrite(DG4, LOW);*/
+  mcp.writeGPIOB(0b000000000);
+  /*mcp.digitalWrite(SGa, HIGH);
   mcp.digitalWrite(SGb, HIGH);
   mcp.digitalWrite(SGc, HIGH);
   mcp.digitalWrite(11, HIGH); 
   mcp.digitalWrite(SGd, HIGH);
   mcp.digitalWrite(SGe, HIGH);
   mcp.digitalWrite(SGf, HIGH);
-  mcp.digitalWrite(SGg, HIGH);
-}
-
-void segOff() {
-  mcp.digitalWrite(SGa, HIGH);
-  mcp.digitalWrite(SGb, HIGH);
-  mcp.digitalWrite(SGc, HIGH);
-  mcp.digitalWrite(11, HIGH); 
-  mcp.digitalWrite(SGd, HIGH);
-  mcp.digitalWrite(SGe, HIGH);
-  mcp.digitalWrite(SGf, HIGH);
-  mcp.digitalWrite(SGg, HIGH);
+  mcp.digitalWrite(SGg, HIGH);*/
 }
 
 void setSegments(int number) {
   //Serial.println(number);
-  switch(number) {
-    case 0:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, LOW);
-      mcp.digitalWrite(SGe, LOW);
-      mcp.digitalWrite(SGf, LOW);
-      mcp.digitalWrite(SGg, HIGH);
-      break;
-    case 1:
-      mcp.digitalWrite(SGa, HIGH);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, HIGH);
-      mcp.digitalWrite(SGe, HIGH);
-      mcp.digitalWrite(SGf, HIGH);
-      mcp.digitalWrite(SGg, HIGH);
-      break;
-    case 2:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, HIGH);
-      mcp.digitalWrite(SGd, LOW);
-      mcp.digitalWrite(SGe, LOW);
-      mcp.digitalWrite(SGf, HIGH);
-      mcp.digitalWrite(SGg, LOW);
-      break;
-    case 3:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, LOW);
-      mcp.digitalWrite(SGe, HIGH);
-      mcp.digitalWrite(SGf, HIGH);
-      mcp.digitalWrite(SGg, LOW);
-      break;
-    case 4:
-      mcp.digitalWrite(SGa, HIGH);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, HIGH);
-      mcp.digitalWrite(SGe, HIGH);
-      mcp.digitalWrite(SGf, LOW);
-      mcp.digitalWrite(SGg, LOW);
-      break;
-    case 5:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, HIGH);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, LOW);
-      mcp.digitalWrite(SGe, HIGH);
-      mcp.digitalWrite(SGf, LOW);
-      mcp.digitalWrite(SGg, LOW);
-      break;
-    case 6:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, HIGH);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, LOW);
-      mcp.digitalWrite(SGe, LOW);
-      mcp.digitalWrite(SGf, LOW);
-      mcp.digitalWrite(SGg, LOW);
-      break;
-    case 7:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, HIGH);
-      mcp.digitalWrite(SGe, HIGH);
-      mcp.digitalWrite(SGf, HIGH);
-      mcp.digitalWrite(SGg, HIGH);
-      break;
-    case 8:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, LOW);
-      mcp.digitalWrite(SGe, LOW);
-      mcp.digitalWrite(SGf, LOW);
-      mcp.digitalWrite(SGg, LOW);
-      break;
-    case 9:
-      mcp.digitalWrite(SGa, LOW);
-      mcp.digitalWrite(SGb, LOW);
-      mcp.digitalWrite(SGc, LOW);
-      mcp.digitalWrite(SGd, LOW);
-      mcp.digitalWrite(SGe, HIGH);
-      mcp.digitalWrite(SGf, LOW);
-      mcp.digitalWrite(SGg, LOW);
-      break;
-    default: //if not 0..9, OFF all segments
-      mcp.digitalWrite(SGa, HIGH);
-      mcp.digitalWrite(SGb, HIGH);
-      mcp.digitalWrite(SGc, HIGH);
-      mcp.digitalWrite(SGd, HIGH);
-      mcp.digitalWrite(SGe, HIGH);
-      mcp.digitalWrite(SGf, HIGH);
-      mcp.digitalWrite(SGg, HIGH);
-      break;
+  mcp.writeGPIOB(segMap[number]);
+
+  /*
+  for (uint8_t z = 0;z < 7;z++) {
+    if((prevSeg & (1 << z)) != (segMap[number] & (1 << z))) {
+      if ((segMap[number] & (1 << z)) > 0) {
+        mcp.digitalWrite(segPins[z], LOW);
+      } else {
+        mcp.digitalWrite(segPins[z], HIGH);
+      }
+    }
   }
+  */
+  prevSeg = segMap[number];
 }
 
 void setDigit(int digit) {
-  //delay(1);
   switch (digit) {
     case 0:
-      mcp.digitalWrite(DG1, HIGH);
-      mcp.digitalWrite(DG2, LOW);
-      mcp.digitalWrite(DG3, LOW);
-      mcp.digitalWrite(DG4, LOW);
+      mcp.writeGPIOA(0b000000001);
       break;
     case 1:
-      mcp.digitalWrite(DG1, LOW);
-      mcp.digitalWrite(DG2, HIGH);
-      mcp.digitalWrite(DG3, LOW);
-      mcp.digitalWrite(DG4, LOW);
+      mcp.writeGPIOA(0b000000010);
       break;
     case 2:
-      mcp.digitalWrite(DG1, LOW);
-      mcp.digitalWrite(DG2, LOW);
-      mcp.digitalWrite(DG3, HIGH);
-      mcp.digitalWrite(DG4, LOW);
+      mcp.writeGPIOA(0b000001000);
       break;
     case 3:
-      mcp.digitalWrite(DG1, LOW);
-      mcp.digitalWrite(DG2, LOW);
-      mcp.digitalWrite(DG3, LOW);
-      mcp.digitalWrite(DG4, HIGH);
+      mcp.writeGPIOA(0b000010000);
       break;
   }
 }
@@ -200,18 +109,20 @@ void showNumber(int number) {
   //get number len
   int len = intLen(number);
   //break integer in buffer and reverse order
-  char buf[2];
+  char buf[3];
   itoa(number, buf, 10);
-  char rbuf[2];
+  char rbuf[3];
   if(len > 1) {
-    rbuf[1] = buf[0];
-    rbuf[0] = buf[1];
+    rbuf[2] = buf[0];
+    rbuf[1] = buf[1];
+    rbuf[0] = buf[2];
   } else {
     rbuf[0] = buf[0];
     rbuf[1] = buf[1];
+    rbuf[2] = buf[2];
   }
 
-  for (int i = 0; i < 2; i++) {
+  for (int i = 0; i < 3; i++) {
     //convert char buffer to integer
     rbuf[i] = rbuf[i] - '0';
     //if value smaller than zero, then equals zero
@@ -224,10 +135,9 @@ void showNumber(int number) {
   for(int x = len; x-- > 0;) {
     int v = rbuf[x];
     //Serial.println(v);
-    segOff();
     setDigit(x);
     setSegments(v);
-    //delay(1);
+    delay(7);
   }
 }
 
@@ -268,25 +178,13 @@ void setup() {
 }
 
 void loop() {
-  //delay(5);
-  Serial.println(i);
+  delay(5);
+  //Serial.println(i);
   showNumber(i);
   
   if(millis() - lastTick > 1000) {
     lastTick = millis();
     i++;
-    if(i>19) {i=0;}
+    if(i>110) {i=100;}
   }
-  /*
-  timer++;
-
-  showNumber(i);
-
-  if(timer > 1000) {
-    timer = 0;
-    i++;
-
-    if(i>20) {i=0;}
-  }
-  */
 }
